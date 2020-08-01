@@ -21,57 +21,57 @@
             return {
                 images: [
                     {
-                        path: '/public/images/sun1',
+                        path: '/public/images/sections/main/sun1',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun1.jpg',
+                        blur: '/public/images/sections/main/blur/sun1.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun2',
+                        path: '/public/images/sections/main/sun2',
                         fallback: 'jpg',
-                        blur: '/public/images/blur/sun2.jpg',
+                        blur: '/public/images/sections/main/blur/sun2.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun3',
+                        path: '/public/images/sections/main/sun3',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun3.jpg',
+                        blur: '/public/images/sections/main/blur/sun3.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun4',
+                        path: '/public/images/sections/main/sun4',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun4.jpg',
+                        blur: '/public/images/sections/main/blur/sun4.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun5',
+                        path: '/public/images/sections/main/sun5',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun5.jpg',
+                        blur: '/public/images/sections/main/blur/sun5.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun6',
+                        path: '/public/images/sections/main/sun6',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun6.jpg',
+                        blur: '/public/images/sections/main/blur/sun6.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun7',
+                        path: '/public/images/sections/main/sun7',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun7.jpg',
+                        blur: '/public/images/sections/main/blur/sun7.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun8',
+                        path: '/public/images/sections/main/sun8',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun8.jpg',
+                        blur: '/public/images/sections/main/blur/sun8.jpg',
                         alt: 'Солнце'
                     },
                     {
-                        path: '/public/images/sun9',
+                        path: '/public/images/sections/main/sun9',
                         fallback: 'png',
-                        blur: '/public/images/blur/sun9.jpg',
+                        blur: '/public/images/sections/main/blur/sun9.jpg',
                         alt: 'Солнце'
                     },
                 ]
