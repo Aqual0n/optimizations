@@ -1,0 +1,11 @@
+.main {
+    padding-top: 200vh;
+
+    &__image {
+        width: 60rem;
+
+        img {
+            width: 100%;
+        }
+    }
+}

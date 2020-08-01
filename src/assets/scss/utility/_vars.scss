@@ -1,0 +1,91 @@
+@import '../../../../node_modules/susy/sass/susy';
+$susy: ('columns': susy-repeat(48), 'gutters': 0, 'spread': 'narrow', 'container-spread': 'narrow', );
+//colors
+$black: #fff;
+//fonts
+$mainFontFamily: '';
+//breakpoints
+$tablet: 650px;
+$maxMobile: $tablet - 1px;
+$tabletLate: 768px;
+$maxMobileLate: $tabletLate - 1px;
+$desktop: 1200px;
+$maxTablet: $desktop - 1px;
+$containerCollapse: 1840px;
+$maxRems: 1440px;
+
+@function toRem($size) {
+    $remSize: $size / 12 + rem;
+
+    @return #{$remSize};
+}
+//$levels: (
+//        orange: (toRem(8),toRem(12), toRem(16)),
+//        purple: (toRem(24),toRem(32), toRem(40)),
+//        green: (toRem(32),toRem(40), toRem(56)),
+//        blue:   (toRem(56),toRem(72), toRem(96)),
+//        red:   (toRem(72),toRem(96), toRem(128)),
+//);
+//
+//@mixin marginLevel($direction,$color) {
+//    @each $levelColor, $pixels in $levels{
+//        @if $levelColor == $color {
+//            @media (max-width: $maxMobile){
+//                margin-#{$direction}: nth(map-get($levels, $levelColor),1);
+//            }
+//            @media (min-width: $tablet) and (max-width: $maxTablet) {
+//                margin-#{$direction}: nth(map-get($levels, $levelColor),2);
+//            }
+//            @media (min-width: $desktop) {
+//                margin-#{$direction}: nth(map-get($levels, $levelColor),3);
+//            }
+//        }
+//    }
+//}
+//@mixin paddingLevel($direction,$color) {
+//    @each $levelColor, $pixels in $levels{
+//        @if $levelColor == $color {
+//            @media (max-width: $maxMobile){
+//                padding-#{$direction}: nth(map-get($levels, $levelColor),1);
+//            }
+//            @media (min-width: $tablet) and (max-width: $maxTablet) {
+//                padding-#{$direction}: nth(map-get($levels, $levelColor),2);
+//            }
+//            @media (min-width: $desktop) {
+//                padding-#{$direction}: nth(map-get($levels, $levelColor),3);
+//            }
+//        }
+//    }
+//}
+//$tags: (
+//        h1 :  (toRem(10), toRem(20), toRem(30), (toRem(15), toRem(25), toRem(35))),
+//        h2 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        h3 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        h4 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        h5 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        h6 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        nav:  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        p1 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        p2 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        p3 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//        p4 :  (toRem(10), toRem(10), toRem(10), (toRem(20), toRem(20), toRem(20))),
+//);
+//
+//@mixin fontSize($name) {
+//    @each $tagName, $tagValue in $tags{
+//        @if $tagName == $name {
+//            @media (max-width: $maxMobile) {
+//                font-size: nth(map-get($tags, $tagName), 1);
+//                line-height: nth(nth(map-get($tags, $tagName), 4), 1);
+//            }
+//            @media (min-width: $tablet) and (max-width: $maxTablet) {
+//                font-size: nth(map-get($tags, $tagName), 2);
+//                line-height: nth(nth(map-get($tags, $tagName), 4), 2);
+//            }
+//            @media (min-width: $desktop) {
+//                font-size: nth(map-get($tags, $tagName), 3);
+//                line-height: nth(nth(map-get($tags, $tagName), 4), 3);
+//            }
+//        }
+//    }
+//}

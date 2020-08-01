@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="{{ language }}" prefix="og: http://ogp.me/ns#">
+<head>
+    <title>{{ title }}</title>
+    <meta property="device" content="{{ device }}">
+    <meta charset="utf-8">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="image_src" href="/share/share.jpg">
+
+    <meta name="twitter:card" content="summary"/>
+    <meta property="fb:app_id" content="">
+    <meta property="og:title" content="{{ title }}"/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="/{{ url === '/' ? '' : url }}"/>
+    <meta property="og:image" content="/share/share.jpg"/>
+    <meta property="og:image:width" content="828">
+    <meta property="og:image:height" content="552">
+    <meta property="og:image:type" content="image/jpeg">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon/favicon-16.png">
+    <link rel="icon" type="image/png" href="/favicon/favicon-32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon/favicon-48.png" sizes="48x48">
+    <link rel="icon" type="image/png" href="/favicon/favicon-57.png" sizes="57x57">
+    <link rel="icon" type="image/png" href="/favicon/favicon-64.png" sizes="64x64">
+    <link rel="icon" type="image/png" href="/favicon/favicon-96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon/favicon-144.png" sizes="144x144">
+
+    <link rel="icon" type="image/png" href="/favicon/favicon.png">
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon-1024.png">
+    <link rel="apple-touch-icon-precomposed" type="image/png" href="/favicon/favicon-72.png"
+          sizes="72x72">
+    <link rel="apple-touch-icon" sizes="76x76" href="/favicon/apple-touch-icon-76.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/favicon/apple-touch-icon-120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/favicon/favicon-144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-touch-icon-76@2x.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon-180.png">
+    {{{ meta }}}
+</head>
+<body>
+<!--vue-ssr-outlet-->
+<script>
+    if (typeof Object.assign != 'function') {
+        Object.assign = function (target) {
+            'use strict';
+            if (target == null) {
+                throw new TypeError('Cannot convert undefined or null to object');
+            }
+
+            target = Object(target);
+            for (var index = 1; index < arguments.length; index++) {
+                var source = arguments[index];
+                if (source != null) {
+                    for (var key in source) {
+                        if (Object.prototype.hasOwnProperty.call(source, key)) {
+                            target[key] = source[key];
+                        }
+                    }
+                }
+            }
+            return target;
+        };
+    }
+</script>
+</body>
+</html>

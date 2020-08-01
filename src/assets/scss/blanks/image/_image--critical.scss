@@ -1,0 +1,14 @@
+.image {
+    position: relative;
+
+    .ls-blur-up-img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
+
+picture {
+    display: block;
+}

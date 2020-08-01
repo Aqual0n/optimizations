@@ -1,0 +1,18 @@
+{
+  "content": {
+    "en": {
+      "text": "<h1>Personal Data Policy</h1>",
+      "meta": {
+        "title": "Privacy",
+        "meta": "<meta name=\"description\" content=\"\"\/>"
+      }
+    },
+    "ru": {
+      "text": "<h1>Политика конфиденциальности</h1>",
+      "meta": {
+        "title": "Политика конфиденциальности",
+        "meta": "<meta name=\"description\" content=\"\"\/>"
+      }
+    }
+  }
+}
