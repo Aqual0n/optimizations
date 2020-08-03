@@ -31,8 +31,20 @@ let walkSync = function(dir) {
             }
 
             sharp(dir + '/' + file)
-                .webp({quality: 75})
+                .resize({width: width})
+                .webp({quality: 80})
                 .toFile(dir + '/' + file.substring(0, file.lastIndexOf(".")) + '.webp')
+                .then(()=> sharp(dir + '/' + file)
+                    .resize({width: width})
+                    .toBuffer()
+                )
+                .then((buffer)=> {
+                    fs.writeFile(dir + '/' + file, buffer, function (err) {
+                        if (err) {
+                            throw err;
+                        }
+                    })
+                })
                 .then(()=> imagemin([dir + '/' + file], {
                     destination: dir + '/',
                     plugins: [
@@ -109,9 +121,14 @@ let buildImages = function() {
                             }
 
                             sharp(relativePath)
-                                .webp({quality: 75})
+                                .resize({width: width})
+                                .webp({quality: 80})
                                 .toFile(publicPath.substring(0, publicPath.lastIndexOf(".")) + '.webp')
-                                .then(()=> imagemin([relativePath], {
+                                .then(()=> sharp(relativePath)
+                                    .resize({width: width})
+                                    .toFile(publicPath)
+                                )
+                                .then(()=> imagemin([publicPath], {
                                     destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
                                     plugins: [
                                         imageminMozjpeg(),
