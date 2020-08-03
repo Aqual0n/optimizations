@@ -24,26 +24,42 @@ let walkSync = function(dir) {
         }
         else {
             let filename = (dir + '/' + file).replace(/^.*[\\\/]/, '');
+            let clearFilename = filename;
             let matches = filename.match(/\[(.*?)\]/);
             let width = null;
             if (matches) {
                 width = parseInt(matches[1], 10);
+                clearFilename = filename.replace(matches[0], '')
+            }
+
+            let brackets = (dir + '/' + file).match(/\[(.*?)\]/);
+            if(brackets) {
+                brackets = brackets[0];
+            } else {
+                brackets = '';
             }
 
             sharp(dir + '/' + file)
                 .resize({width: width})
                 .webp({quality: 80})
-                .toFile(dir + '/' + file.substring(0, file.lastIndexOf(".")) + '.webp')
+                .toFile(dir + '/' + file.replace(brackets, '').substring(0, file.lastIndexOf(".")) + '.webp')
                 .then(()=> sharp(dir + '/' + file)
                     .resize({width: width})
                     .toBuffer()
                 )
                 .then((buffer)=> {
-                    fs.writeFile(dir + '/' + file, buffer, function (err) {
-                        if (err) {
-                            throw err;
-                        }
-                    })
+                    if(fs.existsSync(dir + '/' + file) && !brackets) {
+                        fs.writeFile(dir + '/' + file, buffer, function (err) {
+                            if (err) {
+                                throw err;
+                            }
+                        })
+                    } else if(fs.existsSync(dir + '/' + file) && brackets){
+                        fs.unlink(dir + '/' + file, ()=> {
+                            sharp(buffer)
+                                .toFile(dir + '/' + file.replace(brackets, ''))
+                        })
+                    }
                 })
                 .then(()=> imagemin([dir + '/' + file], {
                     destination: dir + '/',
@@ -120,16 +136,23 @@ let buildImages = function() {
                                 width = parseInt(matches[1], 10);
                             }
 
+                            let brackets = publicPath.match(/\[(.*?)\]/);
+                            if(brackets) {
+                                brackets = brackets[0];
+                            } else {
+                                brackets = '';
+                            }
+
                             sharp(relativePath)
                                 .resize({width: width})
                                 .webp({quality: 80})
-                                .toFile(publicPath.substring(0, publicPath.lastIndexOf(".")) + '.webp')
+                                .toFile(publicPath.replace(brackets, '').substring(0, publicPath.lastIndexOf(".")) + '.webp')
                                 .then(()=> sharp(relativePath)
                                     .resize({width: width})
-                                    .toFile(publicPath)
+                                    .toFile(publicPath.replace(brackets, ''))
                                 )
                                 .then(()=> imagemin([publicPath], {
-                                    destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
+                                    destination: publicPath.replace(brackets, '').substring(0, publicPath.lastIndexOf("/")) + '/',
                                     plugins: [
                                         imageminMozjpeg(),
                                         imageminPngquant({
