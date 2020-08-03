@@ -2,6 +2,8 @@ const imagemin = require("imagemin"),    // The imagemin module.
     webp = require("imagemin-webp"),   // imagemin's WebP plugin.
     src = "./src/assets/images/",
     dest = "./public/images/";
+const imageminMozjpeg = require('imagemin-mozjpeg');
+const imageminPngquant = require('imagemin-pngquant');
 
 const fs = require('fs');
 const chokidar = require('chokidar');
@@ -18,12 +20,23 @@ let walkSync = function(dir) {
             imagemin([dir + '/' + file + '/*.{jpg,png}'], {
                 destination: dir + '/' + file + '/',
                 plugins: [
-                    webp({
-                        quality: 75,
+                    imageminMozjpeg(),
+                    imageminPngquant({
+                        quality: [0.6, 0.8]
                     })
                 ]
-            }).then(() => {
+            }).then((res) => {
                 console.log('Images optimized');
+            });
+            imagemin([dir + '/' + file + '/*.{jpg,png}'], {
+                destination: dir + '/' + file + '/',
+                plugins: [
+                    webp({
+                        quality: 75,
+                    }),
+                ]
+            }).then((res) => {
+                console.log('Webp created');
             });
             walkSync(dir + '/' + file);
         }
@@ -57,11 +70,11 @@ let buildImages = function() {
                         console.log('public path ', publicPath)
                         switch (event) {
                             case "add":
-                                fs.copyFile(relativePath, publicPath, (err)=> {
-                                    if(err) {
-                                        console.log(err);
-                                    }
-                                })
+                                // fs.copyFile(relativePath, publicPath, (err)=> {
+                                //     if(err) {
+                                //         console.log(err);
+                                //     }
+                                // })
                                 break;
                             case "addDir":
                                 fs.mkdir(publicPath, (err)=> {
@@ -86,13 +99,20 @@ let buildImages = function() {
                         imagemin([relativePath], {
                             destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
                             plugins: [
-                                webp({
-                                    quality: 75,
+                                imageminMozjpeg(),
+                                imageminPngquant({
+                                    quality: [0.6, 0.8]
                                 })
                             ]
-                        }).then(() => {
-                            console.log(`image ${path} updated`);
-                        });
+                        })
+                        imagemin([relativePath], {
+                            destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
+                            plugins: [
+                                webp({
+                                    quality: 75,
+                                }),
+                            ]
+                        })
                     })
                 });
             }
