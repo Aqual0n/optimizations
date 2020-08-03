@@ -5,6 +5,9 @@ const imagemin = require("imagemin"),    // The imagemin module.
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminPngquant = require('imagemin-pngquant');
 
+const sharp = require('sharp');
+
+
 const fs = require('fs');
 const chokidar = require('chokidar');
 const ncp = require('ncp').ncp;
@@ -17,30 +20,31 @@ let walkSync = function(dir) {
     let files = fs.readdirSync(dir);
     files.forEach(function(file) {
         if (fs.statSync(dir + '/' + file).isDirectory()) {
-            imagemin([dir + '/' + file + '/*.{jpg,png}'], {
-                destination: dir + '/' + file + '/',
-                plugins: [
-                    imageminMozjpeg(),
-                    imageminPngquant({
-                        quality: [0.6, 0.8]
-                    })
-                ]
-            }).then((res) => {
-                console.log('Images optimized');
-            });
-            imagemin([dir + '/' + file + '/*.{jpg,png}'], {
-                destination: dir + '/' + file + '/',
-                plugins: [
-                    webp({
-                        quality: 75,
-                    }),
-                ]
-            }).then((res) => {
-                console.log('Webp created');
-            });
             walkSync(dir + '/' + file);
         }
         else {
+            let filename = (dir + '/' + file).replace(/^.*[\\\/]/, '');
+            let matches = filename.match(/\[(.*?)\]/);
+            let width = null;
+            if (matches) {
+                width = parseInt(matches[1], 10);
+            }
+
+            sharp(dir + '/' + file)
+                .webp({quality: 75})
+                .toFile(dir + '/' + file.substring(0, file.lastIndexOf(".")) + '.webp')
+                .then(()=> imagemin([dir + '/' + file], {
+                    destination: dir + '/',
+                    plugins: [
+                        imageminMozjpeg(),
+                        imageminPngquant({
+                            quality: [0.6, 0.8]
+                        })
+                    ]
+                }))
+                .then((res) => {
+                    console.log(`image ${dir}/${file} optimized`);
+                });
             return false
         }
     });
@@ -96,23 +100,33 @@ let buildImages = function() {
                                 break;
                         }
 
-                        imagemin([relativePath], {
-                            destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
-                            plugins: [
-                                imageminMozjpeg(),
-                                imageminPngquant({
-                                    quality: [0.6, 0.8]
+                        if(fs.existsSync(relativePath)) {
+                            let filename = relativePath.replace(/^.*[\\\/]/, '');
+                            let matches = filename.match(/\[(.*?)\]/);
+                            let width = null;
+                            if (matches) {
+                                width = parseInt(matches[1], 10);
+                            }
+
+                            sharp(relativePath)
+                                .webp({quality: 75})
+                                .toFile(publicPath.substring(0, publicPath.lastIndexOf(".")) + '.webp')
+                                .then(()=> imagemin([relativePath], {
+                                    destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
+                                    plugins: [
+                                        imageminMozjpeg(),
+                                        imageminPngquant({
+                                            quality: [0.6, 0.8]
+                                        })
+                                    ]
+                                }))
+                                .then((res) => {
+                                    console.log(`image ${relativePath} is optimized and copied to ${publicPath}`);
                                 })
-                            ]
-                        })
-                        imagemin([relativePath], {
-                            destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
-                            plugins: [
-                                webp({
-                                    quality: 75,
-                                }),
-                            ]
-                        })
+                                .catch((err) => {
+                                    console.log(err)
+                                });
+                        }
                     })
                 });
             }
