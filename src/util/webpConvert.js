@@ -1,12 +1,15 @@
-let imagemin = require("imagemin"),    // The imagemin module.
+const imagemin = require("imagemin"),    // The imagemin module.
     webp = require("imagemin-webp"),   // imagemin's WebP plugin.
-    outputFolder = "./public/images/",            // Output folder
-    images = "./public/images/*.{jpg,png}",
     src = "./src/assets/images/",
     dest = "./public/images/";
 
-let fs = require('fs');
-let ncp = require('ncp').ncp;
+const fs = require('fs');
+const chokidar = require('chokidar');
+const ncp = require('ncp').ncp;
+
+let watcher = chokidar.watch(src, {
+    cwd: '.',
+});
 
 let walkSync = function(dir) {
     let files = fs.readdirSync(dir);
@@ -30,28 +33,71 @@ let walkSync = function(dir) {
     });
 };
 
-fs.mkdir(dest, (err)=> {
-    if(err) {
-        console.log(err)
-    } else {
-        console.log('images folder created')
-    }
-})
+let buildImages = function() {
+    fs.rmdir(dest, { recursive: true }, (err) => {
+        if (err) {
+            throw err;
+        }
 
-ncp(src, dest, function (err) {
-    if (err) {
-        return console.error(err);
-    }
-    walkSync('./public/images');
-});
+        fs.mkdir(dest, (err)=> {
+            if(err) {
+                console.log(err)
+            } else {
+                console.log('images folder created')
 
-// imagemin([images], {
-//     destination: outputFolder,
-//     plugins: [
-//         webp({
-//             quality: 75,
-//         })
-//     ]
-// }).then(() => {
-//     console.log('Images optimized');
-// });
+                ncp(src, dest, function (err) {
+                    if (err) {
+                        return console.error(err);
+                    }
+                    walkSync('./public/images');
+                    watcher.on('all', (event, path) => {
+                        let relativePath = path.split('\\').join('/')
+                        let publicPath = './public/' + relativePath.replace('src/assets/', '')
+                        // console.log('updated ', event, relativePath);
+                        console.log('public path ', publicPath)
+                        switch (event) {
+                            case "add":
+                                fs.copyFile(relativePath, publicPath, (err)=> {
+                                    if(err) {
+                                        console.log(err);
+                                    }
+                                })
+                                break;
+                            case "addDir":
+                                fs.mkdir(publicPath, (err)=> {
+                                    if(err) {
+                                        console.log(err);
+                                    }
+                                })
+                                break;
+                            case "unlink":
+                                if(fs.existsSync(publicPath)) {
+                                    fs.unlinkSync(`${publicPath}`)
+                                    fs.unlinkSync(`${publicPath.substring(0, publicPath.lastIndexOf(".")) + '.webp'}`)
+                                }
+                                break;
+                            case "unlinkDir":
+                                fs.rmdirSync(`./${publicPath}`, { recursive: true });
+                                break;
+                            default:
+                                break;
+                        }
+
+                        imagemin([relativePath], {
+                            destination: publicPath.substring(0, publicPath.lastIndexOf("/")) + '/',
+                            plugins: [
+                                webp({
+                                    quality: 75,
+                                })
+                            ]
+                        }).then(() => {
+                            console.log(`image ${path} updated`);
+                        });
+                    })
+                });
+            }
+        })
+    });
+}
+
+buildImages();

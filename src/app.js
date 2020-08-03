@@ -4,12 +4,12 @@ import App from './App.vue'
 import createStore from './store'
 import createRouter from './router'
 import titleMixin from './util/title'
-import 'lazysizes';
-import 'lazysizes/plugins/blur-up/ls.blur-up';
+import 'lazysizes'
+import 'lazysizes/plugins/blur-up/ls.blur-up'
 
 if (process.browser) {
-    window.lazySizesConfig = window.lazySizesConfig || {};
-    window.lazySizesConfig.loadMode = 1;
+    window.lazySizesConfig = window.lazySizesConfig || {}
+    window.lazySizesConfig.loadMode = 1
 
     const VueAwesomeSwiper = import('vue-awesome-swiper/dist/ssr')
     Vue.use(VueAwesomeSwiper)

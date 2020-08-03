@@ -22,29 +22,29 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            path: {
-                type: String,
-                required: true,
-            },
-            fallbackExt: {
-                type: String,
-                required: true,
-            },
-            alt: {
-                type: String,
-                required: true,
-            },
-            blur: {
-                type: String,
-                required: false,
-            }
+export default {
+    props: {
+        path: {
+            type: String,
+            required: true
         },
-        computed: {
-            fallbackSrc() {
-                return `${this.path}.${this.fallbackExt}`;
-            }
+        fallbackExt: {
+            type: String,
+            required: true
         },
+        alt: {
+            type: String,
+            required: true
+        },
+        blur: {
+            type: String,
+            required: false
+        }
+    },
+    computed: {
+        fallbackSrc () {
+            return `${this.path}.${this.fallbackExt}`
+        }
     }
+}
 </script>

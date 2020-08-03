@@ -10,7 +10,7 @@
 
 <script>
 import MyHeader from '../sections/TheHeader.vue'
-import Main from "../sections/Main.vue";
+import Main from '../sections/Main.vue'
 import MyFooter from '../sections/TheFooter.vue'
 
 export default {
