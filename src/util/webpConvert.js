@@ -1,68 +1,72 @@
-const imagemin = require("imagemin"),    // The imagemin module.
-    webp = require("imagemin-webp"),   // imagemin's WebP plugin.
-    src = "./src/assets/images/",
-    dest = "./public/images/";
-const imageminMozjpeg = require('imagemin-mozjpeg');
-const imageminPngquant = require('imagemin-pngquant');
+const imagemin = require('imagemin')    // The imagemin module.
+const webp = require('imagemin-webp')
+// imagemin's WebP plugin.
+const src = './src/assets/images/'
+const dest = './public/images/'
+const imageminMozjpeg = require('imagemin-mozjpeg')
+const imageminPngquant = require('imagemin-pngquant')
 
-const sharp = require('sharp');
+const sharp = require('sharp')
 
+const fs = require('fs')
+const chokidar = require('chokidar')
+const { ncp } = require('ncp')
 
-const fs = require('fs');
-const chokidar = require('chokidar');
-const ncp = require('ncp').ncp;
+const watcher = chokidar.watch(src, {
+    cwd: '.'
+})
 
-let watcher = chokidar.watch(src, {
-    cwd: '.',
-});
+const removeBrackets = function (string) {
+    const brackets = string.match(/\[(.*?)\]/)
+    if (brackets) {
+        return string.replace(brackets[0], '')
+    }
+    return string
+}
 
-let walkSync = function(dir) {
-    let files = fs.readdirSync(dir);
-    files.forEach(function(file) {
-        if (fs.statSync(dir + '/' + file).isDirectory()) {
-            walkSync(dir + '/' + file);
-        }
-        else {
-            let filename = (dir + '/' + file).replace(/^.*[\\\/]/, '');
-            let clearFilename = filename;
-            let matches = filename.match(/\[(.*?)\]/);
-            let width = null;
+const walkSync = function (dir) {
+    const files = fs.readdirSync(dir)
+    files.forEach(file => {
+        if (fs.statSync(`${dir}/${file}`).isDirectory()) {
+            walkSync(`${dir}/${file}`)
+        } else {
+            const filename = (`${dir}/${file}`).replace(/^.*[\\\/]/, '')
+            const matches = filename.match(/\[(.*?)\]/)
+            let width = null
             if (matches) {
-                width = parseInt(matches[1], 10);
-                clearFilename = filename.replace(matches[0], '')
+                width = parseInt(matches[1], 10)
             }
 
-            let brackets = (dir + '/' + file).match(/\[(.*?)\]/);
-            if(brackets) {
-                brackets = brackets[0];
+            let brackets = (`${dir}/${file}`).match(/\[(.*?)\]/)
+            if (brackets) {
+                brackets = brackets[0]
             } else {
-                brackets = '';
+                brackets = ''
             }
 
-            sharp(dir + '/' + file)
-                .resize({width: width})
-                .webp({quality: 80})
-                .toFile(dir + '/' + file.replace(brackets, '').substring(0, file.lastIndexOf(".")) + '.webp')
-                .then(()=> sharp(dir + '/' + file)
-                    .resize({width: width})
-                    .toBuffer()
-                )
-                .then((buffer)=> {
-                    if(fs.existsSync(dir + '/' + file) && !brackets) {
-                        fs.writeFile(dir + '/' + file, buffer, function (err) {
+            sharp(`${dir}/${file}`)
+                .resize({ width })
+                .webp({ quality: 80 })
+                .toFile(`${dir}/${removeBrackets(file).substring(0, removeBrackets(file).lastIndexOf('.'))}.webp`)
+                .then(() => sharp(`${dir}/${file}`)
+                    .resize({ width })
+                    .toBuffer())
+                .then(buffer => {
+                    if (fs.existsSync(`${dir}/${file}`) && !brackets) {
+                        fs.writeFile(`${dir}/${file}`, buffer, err => {
                             if (err) {
-                                throw err;
+                                throw err
                             }
                         })
-                    } else if(fs.existsSync(dir + '/' + file) && brackets){
-                        fs.unlink(dir + '/' + file, ()=> {
+                    } else if (fs.existsSync(`${dir}/${file}`) && brackets) {
+                        fs.unlink(`${dir}/${file}`, () => {
                             sharp(buffer)
-                                .toFile(dir + '/' + file.replace(brackets, ''))
+                                .toFile(`${dir}/${file.replace(brackets, '')}`)
                         })
                     }
                 })
-                .then(()=> imagemin([dir + '/' + file], {
-                    destination: dir + '/',
+                .then(() => imagemin([`${dir}/${file}`], {
+                    destination: `${dir}/`,
                     plugins: [
                         imageminMozjpeg(),
                         imageminPngquant({
@@ -70,89 +74,88 @@ let walkSync = function(dir) {
                         })
                     ]
                 }))
-                .then((res) => {
-                    console.log(`image ${dir}/${file} optimized`);
-                });
+                .then(res => {
+                    console.log(`image ${dir}/${file} optimized`)
+                })
             return false
         }
-    });
-};
+    })
+}
 
-let buildImages = function() {
-    fs.rmdir(dest, { recursive: true }, (err) => {
+const buildImages = function () {
+    fs.rmdir(dest, { recursive: true }, err => {
         if (err) {
-            throw err;
+            throw err
         }
 
-        fs.mkdir(dest, (err)=> {
-            if(err) {
+        fs.mkdir(dest, err => {
+            if (err) {
                 console.log(err)
             } else {
                 console.log('images folder created')
 
-                ncp(src, dest, function (err) {
+                ncp(src, dest, err => {
                     if (err) {
-                        return console.error(err);
+                        return console.error(err)
                     }
-                    walkSync('./public/images');
+                    walkSync('./public/images')
                     watcher.on('all', (event, path) => {
-                        let relativePath = path.split('\\').join('/')
-                        let publicPath = './public/' + relativePath.replace('src/assets/', '')
+                        const relativePath = path.split('\\').join('/')
+                        const publicPath = `./public/${relativePath.replace('src/assets/', '')}`
                         // console.log('updated ', event, relativePath);
                         console.log('public path ', publicPath)
                         switch (event) {
-                            case "add":
-                                // fs.copyFile(relativePath, publicPath, (err)=> {
-                                //     if(err) {
-                                //         console.log(err);
-                                //     }
-                                // })
-                                break;
-                            case "addDir":
-                                fs.mkdir(publicPath, (err)=> {
-                                    if(err) {
-                                        console.log(err);
-                                    }
-                                })
-                                break;
-                            case "unlink":
-                                if(fs.existsSync(publicPath)) {
-                                    fs.unlinkSync(`${publicPath}`)
-                                    fs.unlinkSync(`${publicPath.substring(0, publicPath.lastIndexOf(".")) + '.webp'}`)
+                        case 'add':
+                            // fs.copyFile(relativePath, publicPath, (err)=> {
+                            //     if(err) {
+                            //         console.log(err);
+                            //     }
+                            // })
+                            break
+                        case 'addDir':
+                            fs.mkdir(publicPath, err => {
+                                if (err) {
+                                    console.log(err)
                                 }
-                                break;
-                            case "unlinkDir":
-                                fs.rmdirSync(`./${publicPath}`, { recursive: true });
-                                break;
-                            default:
-                                break;
+                            })
+                            break
+                        case 'unlink':
+                            if (fs.existsSync(removeBrackets(publicPath))) {
+                                fs.unlinkSync(`${removeBrackets(publicPath)}`)
+                                fs.unlinkSync(`${removeBrackets(publicPath).substring(0, removeBrackets(publicPath).lastIndexOf('.'))}.webp`)
+                            }
+                            break
+                        case 'unlinkDir':
+                            fs.rmdirSync(`./${publicPath}`, { recursive: true })
+                            break
+                        default:
+                            break
                         }
 
-                        if(fs.existsSync(relativePath)) {
-                            let filename = relativePath.replace(/^.*[\\\/]/, '');
-                            let matches = filename.match(/\[(.*?)\]/);
-                            let width = null;
+                        if (fs.existsSync(relativePath)) {
+                            const filename = relativePath.replace(/^.*[\\\/]/, '')
+                            const matches = filename.match(/\[(.*?)\]/)
+                            let width = null
                             if (matches) {
-                                width = parseInt(matches[1], 10);
+                                width = parseInt(matches[1], 10)
                             }
 
-                            let brackets = publicPath.match(/\[(.*?)\]/);
-                            if(brackets) {
-                                brackets = brackets[0];
+                            let brackets = publicPath.match(/\[(.*?)\]/)
+                            if (brackets) {
+                                brackets = brackets[0]
                             } else {
-                                brackets = '';
+                                brackets = ''
                             }
 
                             sharp(relativePath)
-                                .resize({width: width})
-                                .webp({quality: 80})
-                                .toFile(publicPath.replace(brackets, '').substring(0, publicPath.lastIndexOf(".")) + '.webp')
-                                .then(()=> sharp(relativePath)
-                                    .resize({width: width})
-                                    .toFile(publicPath.replace(brackets, ''))
-                                )
-                                .then(()=> imagemin([publicPath], {
-                                    destination: publicPath.replace(brackets, '').substring(0, publicPath.lastIndexOf("/")) + '/',
+                                .resize({ width })
+                                .webp({ quality: 80 })
+                                .toFile(`${removeBrackets(publicPath).substring(0, removeBrackets(publicPath).lastIndexOf('.'))}.webp`)
+                                .then(() => sharp(relativePath)
+                                    .resize({ width })
+                                    .toFile(publicPath.replace(brackets, '')))
+                                .then(() => imagemin([publicPath], {
+                                    destination: `${publicPath.replace(brackets, '').substring(0, publicPath.lastIndexOf('/'))}/`,
                                     plugins: [
                                         imageminMozjpeg(),
                                         imageminPngquant({
@@ -160,18 +163,18 @@ let buildImages = function() {
                                         })
                                     ]
                                 }))
-                                .then((res) => {
-                                    console.log(`image ${relativePath} is optimized and copied to ${publicPath}`);
+                                .then(res => {
+                                    console.log(`image ${relativePath} is optimized and copied to ${publicPath}`)
                                 })
-                                .catch((err) => {
+                                .catch(err => {
                                     console.log(err)
-                                });
+                                })
                         }
                     })
-                });
+                })
             }
         })
-    });
+    })
 }
 
-buildImages();
+buildImages()
