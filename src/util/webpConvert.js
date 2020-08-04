@@ -1,16 +1,13 @@
-const imagemin = require('imagemin')    // The imagemin module.
-const webp = require('imagemin-webp')
-// imagemin's WebP plugin.
-const src = './src/assets/images/'
-const dest = './public/images/'
+const imagemin = require('imagemin')
 const imageminMozjpeg = require('imagemin-mozjpeg')
 const imageminPngquant = require('imagemin-pngquant')
-
-const sharp = require('sharp')
-
 const fs = require('fs')
 const chokidar = require('chokidar')
 const { ncp } = require('ncp')
+
+const src = './src/assets/images/'
+const dest = './public/images/'
+const sharp = require('sharp')
 
 const watcher = chokidar.watch(src, {
     cwd: '.'
@@ -43,7 +40,6 @@ const walkSync = function (dir) {
             } else {
                 brackets = ''
             }
-
             sharp(`${dir}/${file}`)
                 .resize({ width })
                 .webp({ quality: 80 })
@@ -53,19 +49,15 @@ const walkSync = function (dir) {
                     .toBuffer())
                 .then(buffer => {
                     if (fs.existsSync(`${dir}/${file}`) && !brackets) {
-                        fs.writeFile(`${dir}/${file}`, buffer, err => {
-                            if (err) {
-                                throw err
-                            }
-                        })
+                        fs.writeFileSync(`${dir}/${file}`, buffer)
                     } else if (fs.existsSync(`${dir}/${file}`) && brackets) {
                         fs.unlink(`${dir}/${file}`, () => {
                             sharp(buffer)
-                                .toFile(`${dir}/${file.replace(brackets, '')}`)
+                                .toFile(`${dir}/${removeBrackets(file)}`)
                         })
                     }
                 })
-                .then(() => imagemin([`${dir}/${file}`], {
+                .then(() => imagemin([`${dir}/${removeBrackets(file)}`], {
                     destination: `${dir}/`,
                     plugins: [
                         imageminMozjpeg(),
@@ -154,8 +146,8 @@ const buildImages = function () {
                                 .then(() => sharp(relativePath)
                                     .resize({ width })
                                     .toFile(publicPath.replace(brackets, '')))
-                                .then(() => imagemin([publicPath], {
-                                    destination: `${publicPath.replace(brackets, '').substring(0, publicPath.lastIndexOf('/'))}/`,
+                                .then(() => imagemin([removeBrackets(publicPath)], {
+                                    destination: `${removeBrackets(publicPath).substring(0, publicPath.lastIndexOf('/'))}/`,
                                     plugins: [
                                         imageminMozjpeg(),
                                         imageminPngquant({

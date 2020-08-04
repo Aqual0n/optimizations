@@ -7,6 +7,8 @@ const {VueLoaderPlugin} = require('vue-loader')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
+const ImageOptimizerPlugin = require('./test-pulgin');
+
 const isProd = process.env.NODE_ENV === 'production';
 module.exports = {
     mode: isProd
@@ -31,6 +33,9 @@ module.exports = {
         alias: {
             'public': path.resolve(__dirname, '../public')
         }
+    },
+    resolveLoader: {
+        modules: ['node_modules', __dirname]
     },
     module: {
         noParse: /es6-promise\.js$/, // avoid webpack shimming process
@@ -88,13 +93,18 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'babel-loader',
             },
+            // {
+            //     test: /\.(png|jpg|gif)$/,
+            //     loader: 'url-loader',
+            //     options: {
+            //         limit: 10000,
+            //         name: '[name].[ext]?[hash]'
+            //     }
+            // },
+            //test loader
             {
-                test: /\.(png|jpg|gif)$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    name: '[name].[ext]?[hash]'
-                }
+                test: /\.(png|jpg)$/,
+                loader: 'test-loader',
             },
             {
                 test: /\.scss$/,
@@ -182,6 +192,7 @@ module.exports = {
             })
         ]
         : [
+            new ImageOptimizerPlugin(),
             new VueLoaderPlugin(),
             new FriendlyErrorsPlugin(),
             new StyleLintPlugin({

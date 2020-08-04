@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint --ext js,vue ./src/components",
     "lint:fix": "eslint --ext js,vue ./src/components --fix",
-    "dev": "node server --host 0.0.0.0 --allowed-hosts 192.168.1.46 && node ./src/util/webpConvert.js",
+    "dev": "node server --host 0.0.0.0 --allowed-hosts 192.168.1.46",
     "start": "cross-env NODE_ENV=production node server",
     "build": "rimraf dist && npm run build:client && npm run build:server",
     "webp": "node ./src/util/webpConvert.js",
