@@ -121,6 +121,8 @@
     "vue-loader": "^15.4.1",
     "vue-svg-loader": "^0.16.0",
     "vue-template-compiler": "^2.5.17",
+    "webfont": "^9.0.0",
+    "webfonts-generator": "^0.4.0",
     "webpack": "^4.16.4",
     "webpack-cli": "^3.1.0",
     "webpack-dev-middleware": "^3.1.3",

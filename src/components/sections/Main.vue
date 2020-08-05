@@ -3,6 +3,10 @@
     +b.MAIN.main
         +e.container.container
             p Main
+            +e.icon--1
+            +e.icon--2
+            +e.icon--3
+            +e.icon--4
             +e.IMAGE-COMPONENT.image(
                 v-for="(image, index) in images"
                 :path="image.path"

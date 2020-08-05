@@ -1,4 +1,43 @@
 .main {
+    &__icon {
+        line-height: 1;
+        display: inline-block;
+        vertical-align: middle;
+        color: #000;
+
+        &--1 {
+            &::before {
+                content: '\ea05';
+            }
+        }
+
+        &--2 {
+            &::before {
+                content: '\ea05';
+            }
+        }
+
+        &--3 {
+            &::before {
+                content: '\ea05';
+            }
+        }
+
+        &--4 {
+            &::before {
+                content: '\ea05';
+            }
+        }
+    }
+
+    &__icon::before {
+        font-family: 'iconfont', sans-serif;
+        font-style: normal;
+        vertical-align: top;
+        font-size: toRem(40);
+        line-height: toRem(40);
+    }
+
     padding-top: 200vh;
 
     &__image {

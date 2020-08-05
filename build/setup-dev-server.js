@@ -15,7 +15,7 @@ const readFile = (fs, file) => {
     }
 }
 
-module.exports = function setupDevServer(app, templatePath, cb) {
+module.exports = function setupDevServer (app, templatePath, cb) {
     let bundle
     let template
     let clientManifest
@@ -35,7 +35,7 @@ module.exports = function setupDevServer(app, templatePath, cb) {
     }
 
     if (process.argv.indexOf('--webp') !== -1) {
-        optimizeImages();
+        optimizeImages()
     }
 
     // read template from disk and watch
@@ -75,7 +75,7 @@ module.exports = function setupDevServer(app, templatePath, cb) {
     })
 
     // hot middleware
-    app.use(require('webpack-hot-middleware')(clientCompiler, {heartbeat: 5000}))
+    app.use(require('webpack-hot-middleware')(clientCompiler, { heartbeat: 5000 }))
 
     // watch and update server renderer
     const serverCompiler = webpack(serverConfig)

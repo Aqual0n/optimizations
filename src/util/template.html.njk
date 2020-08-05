@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ fontName }}</title>
+    <style>
+      body {
+        margin: 0;
+        padding:10px 20px;
+        background: #fff;
+        color: #222;
+        font-family:"Helvetica Neue", Arial, sans-serif;
+      }
+
+      h1 {
+        margin:0 0 20px;
+        font-size: 32px;
+        font-weight: normal;
+      }
+
+      .icons {
+        margin-bottom: 40px;
+        -webkit-column-count: 5;
+           -moz-column-count: 5;
+                column-count: 5;
+      }
+
+      .icons__item {
+        padding: 4px 0;
+      }
+
+      .icons__item,
+      .icons__item i {
+        cursor: pointer;
+        vertical-align: middle;
+      }
+
+      .icons__item:hover {
+        color: #3c90be;
+      }
+
+      .icons__item span {
+        display: inline-block;
+        line-height: 3em;
+        margin-left: 5px;
+      }
+
+      @font-face {
+        font-family: "{{ fontName }}";
+        font-style: normal;
+        font-weight: 400;
+        font-display: auto;
+        src: url("iconfont.woff2") format("woff2"), url("iconfont.woff") format("woff"); 
+      }
+
+      .{{ className }} {
+        display: inline-block;
+        font-family: "{{ fontName }}";
+        font-weight: 400;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        line-height: 1;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .{{ className }}::before {
+        font-size: 48px;
+        display: inline-block;
+        font-family: "{{ fontName }}";
+        font-weight: 400;
+        font-style: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        line-height: 1;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      {% for glyph in glyphs %}
+      .{{ className }}-{{ glyph.name }}::before {
+        content: "\{{ glyph.unicode[0].charCodeAt(0).toString(16) }}";
+      }
+      {% endfor %}
+    </style>
+  </head>
+  <body>
+    <h1>List Icons</h1>
+      <div class="icons" id="icons">
+          {% for glyph in glyphs %}
+            <div class="icons__item">
+              <i class="{{ className }} {{ className }}-3x {{ className }}-{{ glyph.name }}"></i>
+              <span>{{ className }}-{{ glyph.name }}</span>
+              <span>\{{ glyph.unicode[0].charCodeAt(0).toString(16) }}</span>
+            </div>
+          {% endfor %}
+      </div>
+  </body>
+</html>
