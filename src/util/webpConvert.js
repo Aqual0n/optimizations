@@ -174,4 +174,4 @@ const buildImages = function () {
 
 // buildImages();
 
-module.exports = buildImages;
+module.exports = buildImages

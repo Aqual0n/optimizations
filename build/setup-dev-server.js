@@ -34,7 +34,9 @@ module.exports = function setupDevServer(app, templatePath, cb) {
         }
     }
 
-    optimizeImages();
+    if (process.argv.indexOf('--webp') !== -1) {
+        optimizeImages();
+    }
 
     // read template from disk and watch
     template = fs.readFileSync(templatePath, 'utf-8')
