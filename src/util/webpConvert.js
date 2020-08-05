@@ -48,14 +48,16 @@ const walkSync = function (dir) {
                     .resize({ width })
                     .toBuffer())
                 .then(buffer => {
-                    if (fs.existsSync(`${dir}/${file}`) && !brackets) {
+                    const exists = fs.existsSync(`${dir}/${file}`)
+                    if (exists && !brackets) {
                         fs.writeFileSync(`${dir}/${file}`, buffer)
-                    } else if (fs.existsSync(`${dir}/${file}`) && brackets) {
-                        fs.unlink(`${dir}/${file}`, () => {
-                            sharp(buffer)
-                                .toFile(`${dir}/${removeBrackets(file)}`)
-                        })
+                    } else if (exists && brackets) {
+                        fs.renameSync(`${dir}/${file}`, `${dir}/${removeBrackets(file)}`)
+                        fs.writeFileSync(`${dir}/${removeBrackets(file)}`, buffer)
                     }
+                })
+                .then(() => {
+                    console.log(`starting optimize ${dir}/${removeBrackets(file)}`)
                 })
                 .then(() => imagemin([`${dir}/${removeBrackets(file)}`], {
                     destination: `${dir}/`,
@@ -67,7 +69,10 @@ const walkSync = function (dir) {
                     ]
                 }))
                 .then(res => {
-                    console.log(`image ${dir}/${file} optimized`)
+                    // console.log(`image ${dir}/${file} optimized`)
+                })
+                .catch(err => {
+                    console.log(err)
                 })
             return false
         }
@@ -94,8 +99,6 @@ const buildImages = function () {
                     watcher.on('all', (event, path) => {
                         const relativePath = path.split('\\').join('/')
                         const publicPath = `./public/${relativePath.replace('src/assets/', '')}`
-                        // console.log('updated ', event, relativePath);
-                        console.log('public path ', publicPath)
                         switch (event) {
                         case 'add':
                             // fs.copyFile(relativePath, publicPath, (err)=> {
@@ -145,7 +148,7 @@ const buildImages = function () {
                                 .toFile(`${removeBrackets(publicPath).substring(0, removeBrackets(publicPath).lastIndexOf('.'))}.webp`)
                                 .then(() => sharp(relativePath)
                                     .resize({ width })
-                                    .toFile(publicPath.replace(brackets, '')))
+                                    .toFile(removeBrackets(publicPath)))
                                 .then(() => imagemin([removeBrackets(publicPath)], {
                                     destination: `${removeBrackets(publicPath).substring(0, publicPath.lastIndexOf('/'))}/`,
                                     plugins: [
@@ -156,10 +159,10 @@ const buildImages = function () {
                                     ]
                                 }))
                                 .then(res => {
-                                    console.log(`image ${relativePath} is optimized and copied to ${publicPath}`)
+                                    // console.log(`image ${relativePath} is optimized and copied to ${publicPath}`)
                                 })
-                                .catch(err => {
-                                    console.log(err)
+                                .catch(error => {
+                                    console.log(error)
                                 })
                         }
                     })
@@ -169,4 +172,6 @@ const buildImages = function () {
     })
 }
 
-buildImages()
+// buildImages();
+
+module.exports = buildImages;

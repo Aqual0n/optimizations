@@ -6,6 +6,8 @@ const chokidar = require('chokidar')
 const clientConfig = require('./webpack.client.config')
 const serverConfig = require('./webpack.server.config')
 
+const optimizeImages = require('../src/util/webpConvert')
+
 const readFile = (fs, file) => {
     try {
         return fs.readFileSync(path.join(clientConfig.output.path, file), 'utf-8')
@@ -31,6 +33,8 @@ module.exports = function setupDevServer(app, templatePath, cb) {
             })
         }
     }
+
+    optimizeImages();
 
     // read template from disk and watch
     template = fs.readFileSync(templatePath, 'utf-8')
