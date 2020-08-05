@@ -8,7 +8,7 @@ const { ncp } = require('ncp')
 const src = './src/assets/images/'
 const dest = './public/images/'
 const sharp = require('sharp')
-
+// creating watcher
 const watcher = chokidar.watch(src, {
     cwd: '.'
 })
@@ -20,13 +20,15 @@ const removeBrackets = function (string) {
     }
     return string
 }
-
+// function that will recursively check images directory
 const walkSync = function (dir) {
     const files = fs.readdirSync(dir)
     files.forEach(file => {
         if (fs.statSync(`${dir}/${file}`).isDirectory()) {
+            // if file is a directory - open this directory
             walkSync(`${dir}/${file}`)
         } else {
+            // else optimize this file and generate webp
             const filename = (`${dir}/${file}`).replace(/^.*[\\\/]/, '')
             const matches = filename.match(/\[(.*?)\]/)
             let width = null
@@ -40,14 +42,15 @@ const walkSync = function (dir) {
             } else {
                 brackets = ''
             }
-            sharp(`${dir}/${file}`)
+            sharp(`${dir}/${file}`)/* resize and generate webp */
                 .resize({ width })
                 .webp({ quality: 80 })
                 .toFile(`${dir}/${removeBrackets(file).substring(0, removeBrackets(file).lastIndexOf('.'))}.webp`)
-                .then(() => sharp(`${dir}/${file}`)
+                .then(() => sharp(`${dir}/${file}`)/* resize and output to buffer */
                     .resize({ width })
                     .toBuffer())
                 .then(buffer => {
+                    /* write buffer into a file */
                     const exists = fs.existsSync(`${dir}/${file}`)
                     if (exists && !brackets) {
                         fs.writeFileSync(`${dir}/${file}`, buffer)
@@ -59,6 +62,7 @@ const walkSync = function (dir) {
                 .then(() => {
                     console.log(`starting optimize ${dir}/${removeBrackets(file)}`)
                 })
+                /* optimize rewrited image */
                 .then(() => imagemin([`${dir}/${removeBrackets(file)}`], {
                     destination: `${dir}/`,
                     plugins: [
@@ -78,24 +82,27 @@ const walkSync = function (dir) {
         }
     })
 }
-
+// entry point
 const buildImages = function () {
+    // removing existing directory
     fs.rmdir(dest, { recursive: true }, err => {
         if (err) {
             throw err
         }
-
+        // recreating it
         fs.mkdir(dest, err => {
             if (err) {
                 console.log(err)
             } else {
                 console.log('images folder created')
-
+                // copying all images from src
                 ncp(src, dest, err => {
                     if (err) {
                         return console.error(err)
                     }
+                    // optimizing and creating webp
                     walkSync('./public/images')
+                    // adding watcher to serve images in ./src/assets/images
                     watcher.on('all', (event, path) => {
                         const relativePath = path.split('\\').join('/')
                         const publicPath = `./public/${relativePath.replace('src/assets/', '')}`

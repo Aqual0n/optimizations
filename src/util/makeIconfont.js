@@ -3,6 +3,10 @@ const webfont = require('webfont').default
 
 const fontPath = './public/fonts/icons/'
 
+const opentype = require('opentype.js');
+
+
+
 webfont({
     files: './src/assets/icons/**/*.svg',
     template: './src/util/template.html.njk',
@@ -12,6 +16,12 @@ webfont({
         'woff',
         'woff2'
     ],
+    glyphTransformFn: obj => {
+        // next string will convert char code to a string
+        // res = String.fromCharCode([Number])
+        console.log(obj.unicode[0].charCodeAt(0).toString(16))
+        return obj;
+    },
     fontHeight: 600,
     normalize: true,
     sort: false
