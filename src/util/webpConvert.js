@@ -24,10 +24,11 @@ const removeBrackets = function (string) {
 const walkSync = function (dir) {
     const files = fs.readdirSync(dir)
     files.forEach(file => {
+        const ext = (`${dir}/${file}`).substring((`${dir}/${file}`).lastIndexOf('.') + 1, (`${dir}/${file}`).length)
         if (fs.statSync(`${dir}/${file}`).isDirectory()) {
             // if file is a directory - open this directory
             walkSync(`${dir}/${file}`)
-        } else {
+        } else if (ext === 'png' || ext === 'jpg') {
             // else optimize this file and generate webp
             const filename = (`${dir}/${file}`).replace(/^.*[\\\/]/, '')
             const matches = filename.match(/\[(.*?)\]/)
@@ -133,8 +134,9 @@ const buildImages = function () {
                         default:
                             break
                         }
+                        const ext = relativePath.substring(relativePath.lastIndexOf('.') + 1, relativePath.length)
 
-                        if (fs.existsSync(relativePath)) {
+                        if (fs.existsSync(relativePath) && (ext === 'png' || ext === 'jpg')) {
                             const filename = relativePath.replace(/^.*[\\\/]/, '')
                             const matches = filename.match(/\[(.*?)\]/)
                             let width = null
@@ -171,6 +173,12 @@ const buildImages = function () {
                                 .catch(error => {
                                     console.log(error)
                                 })
+                        } else if (fs.existsSync(relativePath)) {
+                            fs.copyFile(relativePath, publicPath, cpError => {
+                                if (cpError) {
+                                    console.log(cpError)
+                                }
+                            })
                         }
                     })
                 })
@@ -179,6 +187,6 @@ const buildImages = function () {
     })
 }
 
-// buildImages();
+buildImages()
 
 module.exports = buildImages
