@@ -104,89 +104,93 @@ const buildImages = function () {
                     // optimizing and creating webp
                     walkSync('./public/images')
                     // adding watcher to serve images in ./src/assets/images
-                    watcher.on('all', (event, path) => {
-                        const relativePath = path.split('\\').join('/')
-                        const publicPath = `./public/${relativePath.replace('src/assets/', '')}`
-                        switch (event) {
-                        case 'add':
-                            // fs.copyFile(relativePath, publicPath, (err)=> {
-                            //     if(err) {
-                            //         console.log(err);
-                            //     }
-                            // })
-                            break
-                        case 'addDir':
-                            fs.mkdir(publicPath, err => {
-                                if (err) {
-                                    console.log(err)
+                    if (process.argv.indexOf('--webp') !== -1) {
+                        watcher.on('all', (event, path) => {
+                            const relativePath = path.split('\\').join('/')
+                            const publicPath = `./public/${relativePath.replace('src/assets/', '')}`
+                            switch (event) {
+                            case 'add':
+                                // fs.copyFile(relativePath, publicPath, (err)=> {
+                                //     if(err) {
+                                //         console.log(err);
+                                //     }
+                                // })
+                                break
+                            case 'addDir':
+                                fs.mkdir(publicPath, err => {
+                                    if (err) {
+                                        console.log(err)
+                                    }
+                                })
+                                break
+                            case 'unlink':
+                                if (fs.existsSync(removeBrackets(publicPath))) {
+                                    fs.unlinkSync(`${removeBrackets(publicPath)}`)
+                                    fs.unlinkSync(`${removeBrackets(publicPath).substring(0, removeBrackets(publicPath).lastIndexOf('.'))}.webp`)
                                 }
-                            })
-                            break
-                        case 'unlink':
-                            if (fs.existsSync(removeBrackets(publicPath))) {
-                                fs.unlinkSync(`${removeBrackets(publicPath)}`)
-                                fs.unlinkSync(`${removeBrackets(publicPath).substring(0, removeBrackets(publicPath).lastIndexOf('.'))}.webp`)
+                                break
+                            case 'unlinkDir':
+                                fs.rmdirSync(`./${publicPath}`, { recursive: true })
+                                break
+                            default:
+                                break
                             }
-                            break
-                        case 'unlinkDir':
-                            fs.rmdirSync(`./${publicPath}`, { recursive: true })
-                            break
-                        default:
-                            break
-                        }
-                        const ext = relativePath.substring(relativePath.lastIndexOf('.') + 1, relativePath.length)
+                            const ext = relativePath.substring(relativePath.lastIndexOf('.') + 1, relativePath.length)
 
-                        if (fs.existsSync(relativePath) && (ext === 'png' || ext === 'jpg')) {
-                            const filename = relativePath.replace(/^.*[\\\/]/, '')
-                            const matches = filename.match(/\[(.*?)\]/)
-                            let width = null
-                            if (matches) {
-                                width = parseInt(matches[1], 10)
-                            }
+                            if (fs.existsSync(relativePath) && (ext === 'png' || ext === 'jpg')) {
+                                const filename = relativePath.replace(/^.*[\\\/]/, '')
+                                const matches = filename.match(/\[(.*?)\]/)
+                                let width = null
+                                if (matches) {
+                                    width = parseInt(matches[1], 10)
+                                }
 
-                            let brackets = publicPath.match(/\[(.*?)\]/)
-                            if (brackets) {
-                                brackets = brackets[0]
-                            } else {
-                                brackets = ''
-                            }
+                                let brackets = publicPath.match(/\[(.*?)\]/)
+                                if (brackets) {
+                                    brackets = brackets[0]
+                                } else {
+                                    brackets = ''
+                                }
 
-                            sharp(relativePath)
-                                .resize({ width })
-                                .webp({ quality: 80 })
-                                .toFile(`${removeBrackets(publicPath).substring(0, removeBrackets(publicPath).lastIndexOf('.'))}.webp`)
-                                .then(() => sharp(relativePath)
+                                sharp(relativePath)
                                     .resize({ width })
-                                    .toFile(removeBrackets(publicPath)))
-                                .then(() => imagemin([removeBrackets(publicPath)], {
-                                    destination: `${removeBrackets(publicPath).substring(0, publicPath.lastIndexOf('/'))}/`,
-                                    plugins: [
-                                        imageminMozjpeg(),
-                                        imageminPngquant({
-                                            quality: [0.6, 0.8]
-                                        })
-                                    ]
-                                }))
-                                .then(res => {
-                                    // console.log(`image ${relativePath} is optimized and copied to ${publicPath}`)
+                                    .webp({ quality: 80 })
+                                    .toFile(`${removeBrackets(publicPath).substring(0, removeBrackets(publicPath).lastIndexOf('.'))}.webp`)
+                                    .then(() => sharp(relativePath)
+                                        .resize({ width })
+                                        .toFile(removeBrackets(publicPath)))
+                                    .then(() => imagemin([removeBrackets(publicPath)], {
+                                        destination: `${removeBrackets(publicPath).substring(0, publicPath.lastIndexOf('/'))}/`,
+                                        plugins: [
+                                            imageminMozjpeg(),
+                                            imageminPngquant({
+                                                quality: [0.6, 0.8]
+                                            })
+                                        ]
+                                    }))
+                                    .then(res => {
+                                        // console.log(`image ${relativePath} is optimized and copied to ${publicPath}`)
+                                    })
+                                    .catch(error => {
+                                        console.log(error)
+                                    })
+                            } else if (fs.existsSync(relativePath)) {
+                                fs.copyFile(relativePath, publicPath, cpError => {
+                                    if (cpError) {
+                                        console.log(cpError)
+                                    }
                                 })
-                                .catch(error => {
-                                    console.log(error)
-                                })
-                        } else if (fs.existsSync(relativePath)) {
-                            fs.copyFile(relativePath, publicPath, cpError => {
-                                if (cpError) {
-                                    console.log(cpError)
-                                }
-                            })
-                        }
-                    })
+                            }
+                        })
+                    }
                 })
             }
         })
     })
 }
 
-buildImages()
+if (process.argv.indexOf('optimize') !== -1) {
+    buildImages()
+}
 
 module.exports = buildImages

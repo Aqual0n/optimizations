@@ -9,7 +9,7 @@
     "dev": "node server --host 0.0.0.0 --allowed-hosts 192.168.1.46",
     "start": "cross-env NODE_ENV=production node server",
     "build": "rimraf dist && npm run build:client && npm run build:server",
-    "webp": "node ./src/util/webpConvert.js",
+    "webp": "node ./src/util/webpConvert.js -- optimize",
     "icons": "node ./src/util/makeIconfont.js",
     "build:client": "cross-env NODE_ENV=production webpack --config build/webpack.client.config.js --progress --hide-modules",
     "build:server": "cross-env NODE_ENV=production webpack --config build/webpack.server.config.js --progress --hide-modules"
