@@ -1,7 +1,7 @@
 {
   "name": "Site",
   "description": "Site",
-  "author": " <caspanch@gmail.com>",
+  "author": " <lashkin200936@gmail.com>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext js,vue ./src/components",
