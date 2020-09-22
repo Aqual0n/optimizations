@@ -14,6 +14,7 @@
             )
             //:src="fallbackSrc"
             img.lazyload(
+                data-sizes="auto"
                 :key="'image'"
                 :data-src="fallbackSrc"
                 :data-lowsrc="blur"
