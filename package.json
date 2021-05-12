@@ -46,7 +46,7 @@
     "memory-fs": "^0.4.1",
     "module-resolver": "^1.0.0",
     "ncp": "^2.0.0",
-    "nodemailer": "^4.6.4",
+    "nodemailer": "^6.4.16",
     "request": "^2.85.0",
     "route-cache": "^0.4.5",
     "scroll-lock": "^2.1.4",
