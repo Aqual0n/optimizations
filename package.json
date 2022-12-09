@@ -30,7 +30,7 @@
     "cors": "^2.8.4",
     "cross-env": "^5.1.1",
     "es6-promise": "^4.1.1",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "express-device": "^0.4.2",
     "express-http-proxy": "^1.1.0",
     "express-mailer": "^0.3.1",
